@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RL-RPL IoT Security Simulation</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">6L</div>
+          <div>
+            <h1>RL-RPL Lab</h1>
+            <p>RPL vs Deep Q trees</p>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-item active" type="button">Two Trees</button>
+          <button class="nav-item" type="button">Decision Log</button>
+          <button class="nav-item" type="button">Comparison</button>
+        </nav>
+
+        <div class="legend">
+          <h2>Legend</h2>
+          <div><span class="dot sink"></span>Sink / root</div>
+          <div><span class="dot high"></span>High energy node</div>
+          <div><span class="dot low"></span>Low energy node</div>
+          <div><span class="line-sample"></span>Selected parent link</div>
+          <div><span class="dead-sample">x</span>Dead node</div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">IoT Security Simulation</p>
+            <h2>Reinforcement Learning-Based RPL Parent Selection</h2>
+          </div>
+          <div class="status-pill">
+            <span id="statusDot"></span>
+            <span id="statusText">Loading data</span>
+          </div>
+        </header>
+
+        <section class="kpi-grid">
+          <article class="metric-card">
+            <span>Round</span>
+            <strong id="roundValue">--</strong>
+          </article>
+          <article class="metric-card">
+            <span>Energy Saved / Packet</span>
+            <strong id="energySavedValue">--</strong>
+            <em id="energySavedHint">--</em>
+          </article>
+          <article class="metric-card">
+            <span>Round Winner</span>
+            <strong id="winnerValue">--</strong>
+            <em id="winnerHint">--</em>
+          </article>
+          <article class="metric-card">
+            <span>Alive Deep Q vs RPL</span>
+            <strong id="aliveValue">--</strong>
+          </article>
+          <article class="metric-card">
+            <span>PDR Deep Q vs RPL</span>
+            <strong id="pdrValue">--</strong>
+          </article>
+          <article class="metric-card">
+            <span>Delay Deep Q vs RPL</span>
+            <strong id="delayValue">--</strong>
+          </article>
+        </section>
+
+        <section class="panel tree-panel">
+            <div class="panel-header">
+              <div>
+                <h3>Routing Trees</h3>
+                <p>Same topology, two parent-selection strategies, round by round.</p>
+              </div>
+              <div class="control-cluster">
+                <button id="playButton" class="icon-button" type="button" title="Play or pause">Play</button>
+                <button id="prevButton" class="icon-button" type="button" title="Previous round">Prev</button>
+                <button id="nextButton" class="icon-button" type="button" title="Next round">Next</button>
+              </div>
+            </div>
+
+            <div class="tree-grid">
+              <article class="tree-card">
+                <div class="tree-title">
+                  <h4>Traditional RPL Tree</h4>
+                  <span>Closest valid parent to ROOT</span>
+                </div>
+                <canvas id="rplCanvas" width="680" height="500"></canvas>
+              </article>
+              <article class="tree-card">
+                <div class="tree-title">
+                  <h4>Deep Q RL-RPL Tree</h4>
+                  <span>Energy, link quality, queue, and Q-value</span>
+                </div>
+                <canvas id="deepQCanvas" width="680" height="500"></canvas>
+              </article>
+            </div>
+
+            <div class="timeline">
+              <input id="roundSlider" type="range" min="0" max="0" value="0" />
+              <div class="timeline-labels">
+                <span>Round 1</span>
+                <span id="lastRoundLabel">Round --</span>
+              </div>
+            </div>
+        </section>
+
+        <section class="comparison-grid">
+          <div class="panel insight-panel">
+            <div class="panel-header">
+              <div>
+                <h3>Energy and Delay Trend</h3>
+                <p>Lower energy and lower delay are better.</p>
+              </div>
+            </div>
+            <canvas id="metricCanvas" width="520" height="210"></canvas>
+            <div class="decision-focus">
+              <span>Highlighted Decision</span>
+              <strong id="focusTitle">Waiting for data</strong>
+              <p id="focusBody">The latest parent-selection row will appear here.</p>
+            </div>
+          </div>
+
+          <div class="panel comparison-panel">
+            <div class="panel-header">
+              <div>
+                <h3>Final Comparison</h3>
+                <p>Overall winner uses weighted scoring; each row still shows the better method.</p>
+              </div>
+            </div>
+            <div id="winnerBanner" class="winner-banner tie">
+              <span id="winnerBannerLabel">Round Winner</span>
+              <strong id="overallWinnerName">--</strong>
+              <p id="overallWinnerDetail">Waiting for comparison data.</p>
+            </div>
+            <div class="table-wrap compact">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th>Weight</th>
+                    <th>RPL</th>
+                    <th>Deep Q</th>
+                    <th>Better</th>
+                  </tr>
+                </thead>
+                <tbody id="comparisonTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="panel-header">
+            <div>
+              <h3>Parent Selection Dataset</h3>
+              <p>Each row shows the exact state, candidate parents, and rule used.</p>
+            </div>
+            <div class="table-tools">
+              <input id="searchInput" type="search" placeholder="Filter node, parent, rule..." />
+              <select id="roundFilter">
+                <option value="all">All rounds</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Round</th>
+                  <th>Node</th>
+                  <th>Parent</th>
+                  <th>Mode</th>
+                  <th>Rule</th>
+                  <th>Selection</th>
+                  <th>Reward</th>
+                  <th>Delivered</th>
+                </tr>
+              </thead>
+              <tbody id="decisionTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
