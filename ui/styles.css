@@ -149,6 +149,11 @@ td {
   vertical-align: middle;
 }
 
+.line-sample.packet {
+  height: 3px;
+  background: #f59f00;
+}
+
 .dead-sample {
   color: var(--graphite);
   font-weight: 800;

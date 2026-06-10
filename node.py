@@ -19,6 +19,8 @@ class Node:
     packets_delivered: int = 0
     packets_dropped: int = 0
     queue_load: float = 0.0
+    parent_changes: int = 0
+    unable_to_send_time: float | None = None
 
     def __post_init__(self) -> None:
         self.energy = self.initial_energy
@@ -28,13 +30,19 @@ class Node:
     def distance_to(self, other: "Node") -> float:
         return hypot(self.x - other.x, self.y - other.y)
 
-    def consume_energy(self, amount: float) -> None:
+    @property
+    def is_root(self) -> bool:
+        return self.is_sink
+
+    def consume_energy(self, amount: float) -> float:
         if self.is_sink or not self.alive:
-            return
+            return 0.0
+        before = self.energy
         self.energy = max(0.0, self.energy - amount)
         if self.energy <= 0.0:
             self.alive = False
             self.parent = None
+        return before - self.energy
 
     def reset_counters(self) -> None:
         self.packets_sent = 0
@@ -43,3 +51,5 @@ class Node:
         self.packets_delivered = 0
         self.packets_dropped = 0
         self.queue_load = 0.0
+        self.parent_changes = 0
+        self.unable_to_send_time = None

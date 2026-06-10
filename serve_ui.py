@@ -11,8 +11,9 @@ START_PORT = 8001
 PROJECT_ROOT = Path(__file__).resolve().parent
 REQUIRED_DATA_FILES = [
     PROJECT_ROOT / "dataset" / "network_snapshots.json",
-    PROJECT_ROOT / "dataset" / "rl_rpl_decisions.csv",
-    PROJECT_ROOT / "dataset" / "rl_rpl_round_metrics.csv",
+    PROJECT_ROOT / "dataset" / "routing_decisions.csv",
+    PROJECT_ROOT / "dataset" / "packet_log.csv",
+    PROJECT_ROOT / "dataset" / "summary_metrics.csv",
 ]
 
 

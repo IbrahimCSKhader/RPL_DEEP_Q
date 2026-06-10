@@ -7,39 +7,56 @@ class TraditionalRPL:
     def __init__(self):
         self.last_decision = None
 
-    def select_parent(self, network: Network, node_id: int, round_number: int) -> int | None:
+    def select_parent(self, network: Network, node_id: int, current_time: float) -> int | None:
         candidates = network.candidate_parents(node_id)
         if not candidates:
             self.last_decision = {
                 "protocol": self.name,
                 "state": "",
-                "rule": "drop: no candidate parent closer to sink",
+                "rule": "drop: no candidate parent closer to ROOT",
                 "candidates": "",
+                "candidate_records": [],
                 "selection_mode": "drop",
-                "equations": "No valid parent satisfies alive, in range, and closer-to-root constraints.",
+                "equations": "No valid parent satisfies alive, in range, and closer-to-ROOT constraints.",
             }
             return None
-        sink = network.sink
-        selected = min(candidates, key=lambda candidate_id: network.nodes[candidate_id].distance_to(sink))
+        root = network.root
+        selected = min(candidates, key=lambda candidate_id: network.nodes[candidate_id].distance_to(root))
         candidate_text = []
+        candidate_records = []
         for candidate_id in candidates:
             candidate = network.nodes[candidate_id]
             energy_ratio = parent_energy_ratio(candidate)
-            distance_to_sink = candidate.distance_to(sink)
+            distance_to_root = candidate.distance_to(root)
             distance_ratio = parent_distance_ratio(network, candidate_id)
             queue_ratio = parent_queue_ratio(candidate)
             link_quality = estimate_link_quality(network, node_id, candidate_id)
+            state_value = 1.0 - distance_ratio
+            selection_value = state_value
             candidate_text.append(
-                f"{candidate_id}:dist_root={distance_to_sink:.2f},dist_ratio={distance_ratio:.3f},"
+                f"{candidate_id}:dist_root={distance_to_root:.2f},dist_ratio={distance_ratio:.3f},"
                 f"energy={energy_ratio:.3f},queue={queue_ratio:.3f},link={link_quality:.3f}"
             )
+            candidate_records.append(
+                {
+                    "candidate_parent": candidate_id,
+                    "energy_ratio": energy_ratio,
+                    "distance_ratio": distance_ratio,
+                    "queue_ratio": queue_ratio,
+                    "link_quality": link_quality,
+                    "q_value": "",
+                    "state_value": state_value,
+                    "selection_value": selection_value,
+                }
+            )
         selected_parent = network.nodes[selected]
-        selected_distance = selected_parent.distance_to(sink)
+        selected_distance = selected_parent.distance_to(root)
         self.last_decision = {
             "protocol": self.name,
             "state": "",
-            "rule": "choose candidate with minimum distance to sink",
+            "rule": "choose candidate with minimum distance to ROOT",
             "candidates": "; ".join(candidate_text),
+            "candidate_records": candidate_records,
             "selection_mode": "traditional",
             "candidate_parent": selected,
             "action": selected,
@@ -80,12 +97,12 @@ def parent_energy_ratio(parent) -> float:
         return 1.0
     if parent.initial_energy <= 0:
         return 0.0
-    return parent.energy / parent.initial_energy
+    return max(0.0, min(parent.energy / parent.initial_energy, 1.0))
 
 
 def parent_distance_ratio(network: Network, parent_id: int) -> float:
     parent = network.nodes[parent_id]
-    return parent.distance_to(network.sink) / max(network.config.area_width, network.config.area_height)
+    return parent.distance_to(network.root) / max(network.config.area_width, network.config.area_height)
 
 
 def parent_queue_ratio(parent) -> float:

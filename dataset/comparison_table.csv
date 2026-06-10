@@ -1,0 +1,16 @@
+Metric,Traditional RPL,Q-learning RL-RPL,Better Approach
+Generated Packets,2271,2303,Q-learning RL-RPL
+Delivered Packets,280,289,Q-learning RL-RPL
+Lost Packets,1991,2014,Traditional RPL
+PDR,12.33%,12.55%,Q-learning RL-RPL
+Total Energy Consumed,42.38162,40.40821,Q-learning RL-RPL
+Average Remaining Energy,0.92728,0.93294,Q-learning RL-RPL
+Alive Nodes,19,21,Q-learning RL-RPL
+Dead Nodes,11,9,Q-learning RL-RPL
+Active Sensors,6,6,Tie
+Average Delay,68.67019,70.13618,Traditional RPL
+Communication Overhead,3278,3308,Traditional RPL
+First Dead Node Time,195.0 s,195.0 s,Tie
+First Unable-to-Send Sensor Time,0.0 s,0.0 s,Tie
+Network Lifetime,420.0 s,420.0 s,Tie
+Parent Changes,33,227,Traditional RPL

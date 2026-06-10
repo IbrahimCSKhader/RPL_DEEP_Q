@@ -1,0 +1,3 @@
+protocol,generated_packets,delivered_packets,lost_packets,PDR,total_energy_consumed,average_remaining_energy,alive_nodes,dead_nodes,active_sensors,average_delay,communication_overhead,first_dead_node_time,first_unable_to_send_time,network_lifetime,parent_changes
+Traditional RPL,2271,280,1991,0.12329,42.38162,0.92728,19,11,6,68.67019,3278,195.00000,0.00000,420.00000,33
+Q-learning RL-RPL,2303,289,2014,0.12549,40.40821,0.93294,21,9,6,70.13618,3308,195.00000,0.00000,420.00000,227
